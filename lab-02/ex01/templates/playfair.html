@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playfair Cipher | Professional Edition</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --success-color: #2ec4b6;
+            --bg-color: #f8faff;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color);
+            color: #2b2d42;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .glass-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-label { font-weight: 600; font-size: 0.9rem; color: #4a4e69; }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #edf2f4;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-main {
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-encrypt { background-color: var(--primary-color); color: white; border: none; }
+        .btn-decrypt { background-color: var(--success-color); color: white; border: none; }
+
+        .output-area {
+            background-color: #f1f5f9 !important;
+            border: 2px dashed #cbd5e1 !important;
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            resize: none;
+        }
+
+        .icon-spin { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar sticky-top mb-5">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2 text-dark fw-bold" href="/">
+            <i data-lucide="shield-check" class="text-primary"></i>
+            VIET4288 CIPHER
+        </a>
+    </div>
+</nav>
+
+<div class="container animate__animated animate__fadeIn">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Hệ Thống Playfair</h1>
+        <p class="text-muted">Mã hóa dữ liệu an toàn với phong cách hiện đại</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="glass-card">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <i data-lucide="lock" class="text-primary"></i>
+                    <h4 class="mb-0 fw-bold">Mã Hóa</h4>
+                </div>
+                
+                <form action="/encrypt" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Bản rõ (Plaintext)</label>
+                        <input type="text" class="form-control" name="inputPlainText" value="{{ old_text_encrypt or '' }}" placeholder="Nhập tin nhắn..." required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Khóa bí mật (Key)</label>
+                        <input type="text" class="form-control" name="inputKeyPlain" value="{{ old_key_encrypt or '' }}" placeholder="VD: MONARCHY" required>
+                    </div>
+                    <button type="submit" class="btn btn-main btn-encrypt w-100 mb-4">
+                        <i data-lucide="refresh-cw" class="icon-spin"></i> THỰC THI MÃ HÓA
+                    </button>
+                </form>
+
+                <label class="form-label">Kết quả (Ciphertext)</label>
+                <textarea class="form-control output-area" rows="2" readonly>{{ result_encrypt or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="glass-card">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <i data-lucide="unlock" class="text-success"></i>
+                    <h4 class="mb-0 fw-bold">Giải Mã</h4>
+                </div>
+
+                <form action="/decrypt" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Bản mã (Ciphertext)</label>
+                        <input type="text" class="form-control" name="inputCipherText" value="{{ old_text_decrypt or '' }}" placeholder="Nhập mã..." required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Khóa bí mật (Key)</label>
+                        <input type="text" class="form-control" name="inputKeyCipher" value="{{ old_key_decrypt or '' }}" placeholder="Nhập khóa..." required>
+                    </div>
+                    <button type="submit" class="btn btn-main btn-decrypt w-100 mb-4">
+                        <i data-lucide="cpu"></i> THỰC THI GIẢI MÃ
+                    </button>
+                </form>
+
+                <label class="form-label">Kết quả (Plaintext)</label>
+                <textarea class="form-control output-area" rows="2" readonly style="color: var(--success-color);">{{ result_decrypt or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
